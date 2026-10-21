@@ -40,3 +40,16 @@ def make_series(
 
     values = baseline + daily + drift + noise
     return pd.Series(values, index=idx, name="value")
+    
+def inject_anomalies(s, anomalies):
+    """Add labelled anomalies to a copy of the series.
+
+    anomalies: list of (start, length, size), where start is a position index.
+    Returns (series_with_anomalies, labels); labels is a boolean Series.
+    """
+    out = s.copy()
+    labels = pd.Series(False, index=s.index, name="is_anomaly")
+    for start, length, size in anomalies:
+        out.iloc[start : start + length] += size
+        labels.iloc[start : start + length] = True
+    return out, labels
